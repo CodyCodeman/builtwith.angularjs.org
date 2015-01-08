@@ -134,3 +134,5 @@ img.AngularJS-large {
 .modal-backdrop.fade.in {
   display: block;
 }
+
+.pagination a { cursor: pointer; }

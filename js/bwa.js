@@ -1,4 +1,4 @@
-var app = angular.module('bwaApp', []);
+var app = angular.module('bwaApp', ['ui.bootstrap']);
 
 app.directive('bwaProject', function() {
   return {
@@ -107,7 +107,7 @@ app.controller('BWAController', function ($scope, $http, $filter) {
       $scope.error = "Cannot get data from the server";
     });
 
-  var num = 2;
+  var numCols = 2;
   $scope.filteredProjects = [];
   $scope.groupedProjects = [];
 
@@ -139,43 +139,50 @@ app.controller('BWAController', function ($scope, $http, $filter) {
       $scope.filteredProjects = $filter('orderBy')($scope.filteredProjects, $scope.sortPrep);
     }
 
-    $scope.currentPage = 0;
+    //Pagination was born yesterday, knows nothing about zero
+    //Corrected with "currentPage-1" for the index in the view
+    //Seems hacky, but didn't want to modify the vendor paginator
+    $scope.currentPage = 1;
     $scope.group();
   };
 
   // re-calculate groupedProjects in place
   $scope.group = function () {
 
-    $scope.groupedProjects.length = Math.ceil($scope.filteredProjects.length / num);
+    $scope.groupedProjects.length = Math.ceil($scope.filteredProjects.length / numCols);
 
     for (var i = 0; i < $scope.filteredProjects.length; i++) {
-      if (i % num === 0) {
-        $scope.groupedProjects[Math.floor(i / num)] = [ $scope.filteredProjects[i] ];
+      if (i % numCols === 0) {
+        $scope.groupedProjects[Math.floor(i / numCols)] = [ $scope.filteredProjects[i] ];
       } else {
-        $scope.groupedProjects[Math.floor(i / num)].push($scope.filteredProjects[i]);
+        $scope.groupedProjects[Math.floor(i / numCols)].push($scope.filteredProjects[i]);
       }
     }
 
-    if ($scope.filteredProjects.length % num !== 0) {
-      $scope.groupedProjects[$scope.groupedProjects.length - 1].length = num - ($scope.filteredProjects.length % num);
+    if ($scope.filteredProjects.length % numCols !== 0) {
+      $scope.groupedProjects[$scope.groupedProjects.length - 1].length = numCols - ($scope.filteredProjects.length % numCols);
     }
 
     $scope.groupToPages();
   };
 
-  var itemsPerPage = 5;
+  var itemsPerCol = 5;
+  $scope.itemsPerPage = itemsPerCol*numCols;
   $scope.pagedProjects = [];
-  $scope.currentPage = 0;
+  //Pagination was born yesterday, knows nothing about zero
+  //Corrected with "currentPage-1" in the view
+  //Seems hacky, but didn't want to modify the vendor paginator
+  $scope.currentPage = 1;
 
   // calc pages in place
   $scope.groupToPages = function () {
     $scope.pagedProjects = [];
 
     for (var i = 0; i < $scope.groupedProjects.length; i++) {
-      if (i % itemsPerPage === 0) {
-        $scope.pagedProjects[Math.floor(i / itemsPerPage)] = [ $scope.groupedProjects[i] ];
+      if (i % itemsPerCol === 0) {
+        $scope.pagedProjects[Math.floor(i / itemsPerCol)] = [ $scope.groupedProjects[i] ];
       } else {
-        $scope.pagedProjects[Math.floor(i / itemsPerPage)].push($scope.groupedProjects[i]);
+        $scope.pagedProjects[Math.floor(i / itemsPerCol)].push($scope.groupedProjects[i]);
       }
     }
   };
@@ -229,22 +236,6 @@ app.controller('BWAController', function ($scope, $http, $filter) {
       ret.push(i);
     }
     return ret;
-  };
-
-  $scope.prevPage = function () {
-    if ($scope.currentPage > 0) {
-      $scope.currentPage--;
-    }
-  };
-
-  $scope.nextPage = function () {
-    if ($scope.currentPage < $scope.pagedProjects.length - 1) {
-      $scope.currentPage++;
-    }
-  };
-
-  $scope.setPage = function () {
-    $scope.currentPage = this.n;
   };
 
 });

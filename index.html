@@ -38,7 +38,7 @@
 
     $script('//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js', function() {
       $script(['//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js',
-               'js/bootstrap.min.js', 'js/bwa.js'], function() {
+               'js/bootstrap.min.js', 'js/ui-bootstrap-custom-0.8.0.min.js', 'js/bwa.js'], function() {
         $().dropdown();
         angular.bootstrap(document, ['bwaApp']);
       });
@@ -133,7 +133,15 @@
         <span class="label label-important bwa-label" ng-repeat="tag in project.tags" ng-click="addTag(tag)">{{tag}}</span>
       </div>
     </script>
-
+    <script type="text/ng-template" id="template/pagination/pagination.html">
+      <div class="pagination">
+        <ul>
+          <li ng-repeat="page in pages" ng-class="{active: page.active, disabled: page.disabled}">
+            <a ng-click="selectPage(page.number)">{{page.text}}</a>
+          </li>
+        </ul>
+      </div>
+    </script>
     <div class="row first bwa-featured">
       <div class="span8">
         <bwa-project project="featured" lightbox="lightbox" class= "well bwa-project-well" add-tag="addTag"></bwa-project>
@@ -197,29 +205,16 @@
 
     <div class="spacer"></div>
 
-    <div class="row bwa-projects" ng-repeat="projectCol in pagedProjects[currentPage]">
+    <div class="row bwa-projects" ng-repeat="projectCol in pagedProjects[currentPage-1]">
       <div class="span6" ng-repeat="project in projectCol">
         <bwa-project project="project" lightbox="lightbox" add-tag="addTag" class= "well bwa-project-well"></bwa-project>
       </div>
     </div>
 
     <div class="center">
-      <div class="pagination">
-        <ul>
-          <li ng-class="{disabled: currentPage == 0}">
-            <a href ng-click="prevPage()">« Prev</a>
-          </li>
-          <li ng-repeat="n in range(pagedProjects.length)"
-            ng-class="{active: n == currentPage}"
-            ng-click="setPage()">
-            <a href ng-bind="n + 1">1</a>
-          </li>
-          <li ng-class="{disabled: currentPage == pagedProjects.length - 1}">
-            <a href ng-click="nextPage()">Next »</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+
+      <pagination total-items="filteredProjects.length" items-per-page="itemsPerPage" page="currentPage" max-size="19"></pagination>
+    </div> 
 
   </div>
 
